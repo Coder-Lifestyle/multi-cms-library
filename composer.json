@@ -1,0 +1,12 @@
+{
+  "name": "Coder-Lifestyle/multi-cms-library",
+  "description": "Shared models and components for multi-domain CMS",
+  "autoload": {
+    "psr-4": {
+      "MultiCmsLibrary\\SharedModels\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.0"
+  }
+}
