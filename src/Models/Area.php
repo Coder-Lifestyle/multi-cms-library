@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -10,10 +10,9 @@ class Area extends Model
 
     /**
      * Relationship to the Menu model.
-     * Each area is associated with one menu.
      */
-    public function menu()
+    public function menus()
     {
-        return $this->belongsTo(Menu::class);
+        return $this->belongsToMany(Menu::class, 'area_menu');
     }
 }
