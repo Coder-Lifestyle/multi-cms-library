@@ -16,4 +16,11 @@ class Menu extends Model
     {
         return $this->hasMany(Column::class);
     }
+    /**
+     * Relationship to get the areas of the menu.
+     */
+    public function areas()
+{
+    return $this->belongsToMany(Area::class, 'area_menu');
+}
 }
