@@ -3,21 +3,14 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class Widget extends Model
 {
-    public function up()
-    {
-        Schema::create('widgets', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('domain_id')->constrained();
-            $table->string('title');
-            $table->string('category')->nullable();
-            $table->text('content')->nullable();
-            $table->timestamps();
-        });
-    }
+    protected $fillable = ['widget_area_id', 'class'];
+    protected $casts = ['settings' => 'json'];
 
+    public function widgetArea()
+    {
+        return $this->belongsTo(WidgetArea::class);
+    }
 }
