@@ -1,6 +1,6 @@
-<?php
+<?php 
 
-namespace App\Models;
+namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +10,10 @@ class Area extends Model
 
     /**
      * Relationship to the Menu model.
+     * Each area is associated with one menu.
      */
-    public function menus()
+    public function menu()
     {
-        return $this->belongsToMany(Menu::class, 'area_menu');
+        return $this->belongsTo(Menu::class);
     }
 }
