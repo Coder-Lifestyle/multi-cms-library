@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItem extends Model
 {
-    protected $fillable = ['column_id', 'parent_id', 'name', 'url', 'type', 'position'];
+    protected $fillable = ['column_id', 'parent_id', 'name', 'url'];
 
     /**
      * Relationship to get the column this menu item belongs to.
@@ -24,13 +23,5 @@ class MenuItem extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class, 'parent_id');
-    }
-
-    /**
-     * Self-referencing relationship to get the child menu items.
-     */
-    public function children(): HasMany
-    {
-        return $this->hasMany(MenuItem::class, 'parent_id');
     }
 }

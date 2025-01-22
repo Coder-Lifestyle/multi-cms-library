@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
-    protected $fillable = ['title', 'body', 'domain_id', 'slug', 'featured_image'];
+    protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
 
     public function domain()
     {
@@ -16,14 +16,6 @@ class Page extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    /**
-     * A page can have multiple categories.
-     */
-    public function categories()
-    {
-        return $this->belongsToMany(Category::class)->withTimestamps(); // Many-to-many relation
     }
 
     /**
