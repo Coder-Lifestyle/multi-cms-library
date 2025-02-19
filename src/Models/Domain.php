@@ -10,8 +10,17 @@ class Domain extends Model
     // protected $table = 'domains';
 
     // Fillable fields allow mass assignment
-    protected $fillable = ['name', 'domain_url'];
+    protected $fillable = [
+        'name',
+        'domain_url',
+        'page_creation_type',
+        'sections',
+    ];
 
+    protected $casts = [
+        'sections' => 'array',
+    ];
+    
     /**
      * A domain has many pages.
      */
