@@ -20,7 +20,7 @@ class Domain extends Model
     protected $casts = [
         'sections' => 'array',
     ];
-    
+
     /**
      * A domain has many pages.
      */
@@ -44,6 +44,14 @@ class Domain extends Model
     {
         return $this->hasMany(Tag::class);
     }
+
+    public function backlinks()
+    {
+        // Assumes each Page model has a 'page_id' and each Backlink belongs to a page via 'page_id'
+        return $this->hasManyThrough(Backlink::class, Page::class, 'page_id', 'id');
+    }
+
+
 
     public function settings()
     {
