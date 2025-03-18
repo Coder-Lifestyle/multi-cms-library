@@ -25,5 +25,10 @@ class Page extends Model
     {
         return $this->belongsToMany(Tag::class)->withTimestamps(); // Many-to-many relation
     }
+
+    public function getPrice()
+    {
+        return DomainSetting::getSetting($this->domain_id, 'backlink_price', 12);
+    }
 }
 
