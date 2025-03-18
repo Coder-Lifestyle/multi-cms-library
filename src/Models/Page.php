@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Page extends Model
 {
     protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
+    protected $appends = ['backlink_price'];
 
     public function domain()
     {
@@ -26,7 +27,7 @@ class Page extends Model
         return $this->belongsToMany(Tag::class)->withTimestamps(); // Many-to-many relation
     }
 
-    public function getPrice()
+    public function getBacklinkPriceAttribute()
     {
         return DomainSetting::getSetting($this->domain_id, 'backlink_price', 12);
     }
