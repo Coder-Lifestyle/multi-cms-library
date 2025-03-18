@@ -31,5 +31,10 @@ class Page extends Model
     {
         return DomainSetting::getSetting($this->domain_id, 'backlink_price', 12);
     }
+
+    public function getStripeProductIdAttribute()
+    {
+        return DomainSetting::getSetting($this->domain_id, 'stripe_product_id', 0);
+    }
 }
 
