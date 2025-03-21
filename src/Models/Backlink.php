@@ -11,12 +11,17 @@ class Backlink extends Model
 
     protected $fillable = [
         'customer_id',
-        'domain_id',
+        'page_id',
         'url',
         'title',
         'rel',
         'backlink_category_id',
+        'subscription_type',
+        'subscription_end_date',
+        'stripe_subscription_id',
+        'is_active'
     ];
+
 
     /**
      * Get the category associated with the backlink.
