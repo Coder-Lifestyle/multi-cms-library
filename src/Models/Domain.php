@@ -3,6 +3,7 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Domain extends Model
 {
@@ -62,5 +63,18 @@ class Domain extends Model
     {
         return $this->settings()->where('key', $key)->value('value') ?? $default;
     }
+
+    public function getMetrics()
+    {
+        return $this->settings()
+            ->where('key', 'like', 'metrics_%')
+            ->get()
+            ->mapWithKeys(function ($setting) {
+                // Remove the "metrics_" prefix from the key
+                $newKey = Str::after($setting->key, 'metrics_');
+                return [$newKey => $setting->value];
+            });
+    }
+
 
 }
