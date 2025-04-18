@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends Model
 {
-    protected $fillable = ['name', 'type', 'area_id'];
+    protected $fillable = ['name', 'type', 'area_id', 'domain_id'];
 
     /**
      * Relationship to the Area model.
@@ -24,5 +24,10 @@ class Menu extends Model
     public function columns(): HasMany
     {
         return $this->hasMany(Column::class);
+    }
+
+    public function domain()
+    {
+        return $this->belongsTo(Domain::class);
     }
 }

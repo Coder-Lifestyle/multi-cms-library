@@ -59,6 +59,16 @@ class Domain extends Model
         return $this->hasMany(DomainSetting::class);
     }
 
+    public function areas()
+    {
+        return $this->hasMany(Area::class);
+    }
+
+    public function menus()
+    {
+        return $this->hasMany(Menu::class);
+    }
+
     public function getSetting($key, $default = null)
     {
         return $this->settings()->where('key', $key)->value('value') ?? $default;
@@ -75,6 +85,4 @@ class Domain extends Model
                 return [$newKey => $setting->value];
             });
     }
-
-
 }
