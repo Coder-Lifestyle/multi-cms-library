@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Page extends Model
 {
     protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
-    protected $appends = ['backlink_price'];
+
+    protected $appends = ['backlink_price', 'full_url'];
 
     public function domain()
     {
@@ -35,6 +36,23 @@ class Page extends Model
     public function getStripeProductIdAttribute()
     {
         return DomainSetting::getSetting($this->domain_id, 'stripe_product_id', 0);
+    }
+
+    public function getFullUrlAttribute()
+    {
+        if (!$this->domain) {
+            return null;
+        }
+
+        $domainUrl = rtrim($this->domain->domain_url, '/');
+
+        $categoryPath = $this->category ? $this->category->getFullSlugPath() : '';
+
+        $pageSlug = $this->slug;
+
+        $fullPath = trim($categoryPath . '/' . $pageSlug, '/');
+
+        return $domainUrl . '/' . $fullPath;
     }
 }
 
