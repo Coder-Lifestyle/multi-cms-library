@@ -4,9 +4,11 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Domain extends Model
 {
+    use HasSettings;    
     // Define the table name if it's different from the plural form of the model
     // protected $table = 'domains';
 
@@ -53,12 +55,6 @@ class Domain extends Model
     }
 
 
-
-    public function settings()
-    {
-        return $this->hasMany(DomainSetting::class);
-    }
-
     public function areas()
     {
         return $this->hasMany(Area::class);
@@ -69,9 +65,9 @@ class Domain extends Model
         return $this->hasMany(Menu::class);
     }
 
-    public function getSetting($key, $default = null)
+    public function widgets()
     {
-        return $this->settings()->where('key', $key)->value('value') ?? $default;
+        return $this->hasMany(Widget::class);
     }
 
     public function getMetrics()

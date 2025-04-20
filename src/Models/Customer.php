@@ -4,9 +4,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Customer extends Authenticatable
 {
+    use HasSettings;
+    
     use HasFactory;
 
     /**

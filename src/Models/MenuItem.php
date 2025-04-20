@@ -4,9 +4,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class MenuItem extends Model
 {
+    use HasSettings;
+
     protected $fillable = ['column_id', 'parent_id', 'name', 'url'];
 
     /**

@@ -3,9 +3,12 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Page extends Model
 {
+    use HasSettings;
+
     protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
 
     protected $appends = ['backlink_price', 'full_url'];

@@ -5,9 +5,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Category extends Model
 {
+    use HasSettings;
+
     protected $fillable = ['name', 'slug', 'domain_id', 'parent_id', 'image_url'];
 
     protected $appends = ['full_url'];

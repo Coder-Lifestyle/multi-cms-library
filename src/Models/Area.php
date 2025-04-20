@@ -3,9 +3,12 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Area extends Model
 {
+    use HasSettings;
+
     protected $fillable = ['name', 'menu_id', 'domain_id'];
 
     /**

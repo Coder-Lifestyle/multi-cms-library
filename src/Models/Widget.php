@@ -3,9 +3,12 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Widget extends Model
 {
+    use HasSettings;
+
     protected $fillable = [
         'domain_id',
         'widget_area_id',
