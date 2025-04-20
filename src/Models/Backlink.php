@@ -4,10 +4,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Backlink extends Model
 {
     use HasFactory;
+    use HasSettings;
 
     protected $fillable = [
         'customer_id',

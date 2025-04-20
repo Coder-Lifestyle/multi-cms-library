@@ -4,9 +4,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Product extends Model
 {
+    use HasSettings;
+
     use HasFactory;
 
     protected $fillable = [

@@ -5,9 +5,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Column extends Model
 {
+    use HasSettings;
+
     protected $fillable = ['menu_id', 'name', 'position'];
 
     /**
