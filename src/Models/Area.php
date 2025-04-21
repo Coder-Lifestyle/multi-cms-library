@@ -9,15 +9,26 @@ class Area extends Model
 {
     use HasSettings;
 
-    protected $fillable = ['name', 'menu_id', 'domain_id'];
+    protected $fillable = ['name', 'domain_id'];
+
+    protected static function booted()
+    {
+        static::updated(function (Area $area) {
+            if ($area->wasChanged('domain_id')) {
+                $area->menus()->update([
+                    'domain_id' => $area->domain_id,
+                ]);
+            }
+        });
+    }
 
     /**
      * Relationship to the Menu model.
      * Each area is associated with one menu.
      */
-    public function menu()
+    public function menus()
     {
-        return $this->belongsTo(Menu::class);
+        return $this->hasMany(Menu::class);
     }
 
     public function domain()
