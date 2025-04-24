@@ -30,15 +30,15 @@ class Page extends Model
     {
         return $this->belongsToMany(Tag::class)->withTimestamps(); // Many-to-many relation
     }
-
+    
     public function getBacklinkPriceAttribute()
     {
-        return DomainSetting::getSetting($this->domain_id, 'backlink_price', 12);
+        return $this->domain?->getSetting('backlink_price', 12);
     }
 
     public function getStripeProductIdAttribute()
     {
-        return DomainSetting::getSetting($this->domain_id, 'stripe_product_id', 0);
+        return $this->domain?->getSetting('stripe_product_id', null);
     }
 
     public function getFullUrlAttribute()

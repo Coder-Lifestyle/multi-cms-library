@@ -18,4 +18,10 @@ class SettingDefinition extends Model
     {
         return static::where('entity_type', $entityType)->get();
     }
+
+    public function settings()
+    {
+        return $this->hasMany(Setting::class, 'key', 'key')
+            ->where('entity_type', $this->entity_type);
+    }
 }
