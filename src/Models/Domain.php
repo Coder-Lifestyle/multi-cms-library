@@ -8,7 +8,7 @@ use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Domain extends Model
 {
-    use HasSettings;    
+    use HasSettings;
     // Define the table name if it's different from the plural form of the model
     // protected $table = 'domains';
 
@@ -70,15 +70,13 @@ class Domain extends Model
         return $this->hasMany(Widget::class);
     }
 
-    public function getMetrics()
+    public function getMetrics(): Collection
     {
-        return $this->settings()
-            ->where('key', 'like', 'metrics_%')
-            ->get()
+        return $this->settings
+            ->filter(fn($setting) => Str::startsWith($setting->key, 'metrics_'))
             ->mapWithKeys(function ($setting) {
-                // Remove the "metrics_" prefix from the key
-                $newKey = Str::after($setting->key, 'metrics_');
-                return [$newKey => $setting->value];
+                $cleanKey = Str::after($setting->key, 'metrics_');
+                return [$cleanKey => $setting->value];
             });
     }
 }
