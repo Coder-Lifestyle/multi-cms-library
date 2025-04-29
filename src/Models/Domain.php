@@ -70,7 +70,7 @@ class Domain extends Model
         return $this->hasMany(Widget::class);
     }
 
-    public function getMetrics(): Collection
+    public function getMetrics()
     {
         return $this->settings
             ->filter(fn($setting) => Str::startsWith($setting->key, 'metrics_'))
