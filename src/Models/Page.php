@@ -23,6 +23,11 @@ class Page extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function backlinks()
+    {
+        return $this->hasMany(Backlink::class)->where('is_active', true);
+    }
+    
     /**
      * A page can have multiple tags.
      */
