@@ -6,14 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasUniqueField;
 
 class Category extends Model
 {
-    use HasSettings;
+    use HasSettings, HasUniqueField;
 
     protected $fillable = ['name', 'slug', 'domain_id', 'parent_id', 'image_url'];
 
     protected $appends = ['full_url'];
+
+    protected array $autoUniqueFields = [
+        'slug' => 'name',
+    ];
+
+    protected array $uniqueFieldScopes = [
+        'slug' => ['domain_id'],
+    ];
 
     public function pages()
     {
