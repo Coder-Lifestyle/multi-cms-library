@@ -24,7 +24,8 @@ class Product extends Model
         'image_url',
         'brand_name',
         'stock_quantity',
-        'rating'
+        'rating',
+        'affiliate_link'
     ];
 
     /**
