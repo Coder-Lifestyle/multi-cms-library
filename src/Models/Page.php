@@ -4,10 +4,11 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 
 class Page extends Model
 {
-    use HasSettings;
+    use HasSettings, HasCacheKeys;
 
     protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
 
