@@ -3,12 +3,21 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
+use ReflectionClass;
 
 class Domain extends Model
 {
-    use HasSettings;
+
+    public const SHOP_PATH         = 'shop';
+    public const CATEGORY_PATH     = 'category';
+    public const CATEGORY_LIST_PATH = 'categories';
+    public const PRODUCT_PATH      = 'product';
+
+    use HasSettings, HasCacheKeys;
     // Define the table name if it's different from the plural form of the model
     // protected $table = 'domains';
 
@@ -78,5 +87,110 @@ class Domain extends Model
                 $cleanKey = Str::after($setting->key, 'metrics_');
                 return [$cleanKey => $setting->value];
             });
+    }
+
+    public function getDomainCacheTag(): string
+    {
+        return "domain:{$this->id}";
+    }
+
+    public function getRouteCacheKey(string $path): string
+    {
+        return "route:{$this->id}:" . md5($path);
+    }
+
+    public function getCacheTagsForPath(string $path, ?Model $model = null): array
+    {
+        $tags = [$this->getDomainCacheTag()];
+
+        $segments = array_filter(explode('/', $path), fn($s) => $s !== '');
+
+        foreach (array_intersect($segments, self::getStaticPaths()) as $seg) {
+            $tags[] = $seg;
+        }
+
+        if ($model && method_exists($model, 'getCacheTags')) {
+            $tags = array_merge($tags, $model->getCacheTags());
+        }
+
+        return array_unique($tags);
+    }
+
+    /**
+     * Builds cache tags for a specific model within this domain.
+     *
+     * Always includes domain tag, and model tags if available.
+     *
+     * @param Model $model
+     * @return string[]
+     */
+    public function getCacheTagsForModel(Model $model): array
+    {
+        $tags = [$this->getDomainCacheTag()];
+
+        if (method_exists($model, 'getCacheTags')) {
+            $tags = array_merge($tags, $model->getCacheTags());
+        }
+
+        return array_unique($tags);
+    }
+
+    /**
+     * Returns all static route segment values defined via *_PATH constants.
+     *
+     * @return string[]
+     */
+    public static function getStaticPaths(): array
+    {
+        $rc = new ReflectionClass(self::class);
+
+        return array_values(array_filter(
+            $rc->getConstants(),
+            fn($val, $key) => str_ends_with($key, '_PATH'),
+            ARRAY_FILTER_USE_BOTH
+        ));
+    }
+
+    /**
+     * Returns a cache configuration array for a given path and optional model.
+     *
+     * Used for cache read/write operations (key + tags).
+     *
+     * @param string $path
+     * @param Model|null $model
+     * @return array{key: string, tags: string[]}
+     */
+    public function getCacheConfigForPath(string $path, ?Model $model = null): array
+    {
+        return [
+            'key'  => $this->getRouteCacheKey($path),
+            'tags' => $this->getCacheTagsForPath($path, $model),
+        ];
+    }
+
+    public function flushModelCache(Model $model): void
+    {
+        // Flush only the specific model's tag (e.g. "page_805")
+        Cache::store('redis')
+            ->tags([$model->getCacheTag()])
+            ->flush();
+    }
+
+
+    public function flushModelGroupCache(Model $model): void
+    {
+        if (!method_exists($model, 'getCacheTags')) {
+            return;
+        }
+
+        Cache::store('redis')
+            ->tags([$this->getDomainCacheTag(), $model->getCacheTags()])->flush();
+    }
+
+    public function flushByPath(string $path): void
+    {
+        Cache::store('redis')
+            ->tags($this->getCacheTagsForPath($path))
+            ->flush();
     }
 }

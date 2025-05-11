@@ -5,12 +5,13 @@ namespace MultiCmsLibrary\SharedModels\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasUniqueField;
 
 class Category extends Model
 {
-    use HasSettings, HasUniqueField;
+    use HasSettings, HasUniqueField, HasCacheKeys;
 
     protected $fillable = ['name', 'slug', 'domain_id', 'parent_id', 'image_url'];
 
@@ -67,6 +68,7 @@ class Category extends Model
         if (!$this->domain) {
             return null;
         }
+        
 
         $domainUrl = rtrim($this->domain->domain_url, '/');
 
