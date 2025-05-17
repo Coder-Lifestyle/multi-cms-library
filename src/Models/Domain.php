@@ -5,9 +5,10 @@ namespace MultiCmsLibrary\SharedModels\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
-use ReflectionClass;
+use Illuminate\Support\Facades\Redis;
 
 class Domain extends Model
 {
@@ -81,6 +82,47 @@ class Domain extends Model
                 $cleanKey = Str::after($setting->key, 'metrics_');
                 return [$cleanKey => $setting->value];
             });
+    }
+
+    public function flushCache(): void
+    {
+        $builder = app(RedisKeyBuilder::class);
+        $domainId = $this->id;
+
+
+        $pageIds = Redis::smembers($builder->domainPagesKey($domainId));
+        $relatedPageIds = Redis::smembers($builder->domainRelatedKey($domainId, 'pages'));
+
+        foreach (collect($pageIds)->merge($relatedPageIds)->unique() as $id) {
+            if ($page = Page::find($id)) {
+                $page->flushCache();
+            }
+        }
+
+        Redis::del($builder->domainPagesKey($domainId));
+        Redis::del($builder->domainRelatedKey($domainId, 'pages'));
+
+        $productIds = Redis::smembers($builder->domainRelatedKey($domainId, 'products'));
+
+        foreach ($productIds as $id) {
+            if ($product = Product::find($id)) {
+                $product->flushCache();
+            }
+        }
+
+        Redis::del($builder->domainRelatedKey($domainId, 'products'));
+
+        $categoryIds = Redis::smembers($builder->domainRelatedKey($domainId, 'categories'));
+
+        foreach ($categoryIds as $id) {
+            if ($category = Category::find($id)) {
+                $category->flushCache();
+            }
+        }
+
+        Redis::del($builder->domainRelatedKey($domainId, 'categories'));
+
+        Cache::store('redis')->forget($builder->staticKey('shop', $domainId));
     }
 
 }

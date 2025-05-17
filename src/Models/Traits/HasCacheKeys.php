@@ -6,22 +6,17 @@ trait HasCacheKeys
 {
     /**
      * Generate a Redis-safe cache key for this model.
-     *
-     * @param string $prefix Optional prefix (e.g. "spintax", "preview", "seo")
-     * @return string
      */
     public function getRedisCacheKey(string $prefix = ''): string
     {
         $model = strtolower(class_basename($this));
-        $id    = $this->getKey();
+        $id = $this->getKey();
 
         return trim("{$prefix}_{$model}_{$id}", '_');
     }
 
     /**
      * Generate a cache key for spintax rendering.
-     *
-     * @return string
      */
     public function getSpintaxCacheKey(): string
     {
@@ -29,22 +24,58 @@ trait HasCacheKeys
     }
 
     /**
-     * Unique cache tag for this model only.
-     * Example: "page_123"
+     * Get model type name (e.g., "page", "product", "category").
      */
-    public function getCacheTag(): string
+    public function getCacheType(): string
     {
-        $model = strtolower(class_basename($this));
-        return "{$model}_{$this->getKey()}";
+        return strtolower(class_basename($this));
     }
 
     /**
-     * Model-specific cache tags (global + specific)
-     * Example: ["page", "page_123"]
+     * Unique cache tag for this model instance (e.g., "page_123").
      */
-    public function getCacheTags(): array
+    public function getCacheTag(): string
     {
-        $model = strtolower(class_basename($this));
-        return [$model, $this->getCacheTag()];
+        return $this->getCacheType() . '_' . $this->getKey();
+    }
+
+    /**
+     * Cache tags used with Laravel's tag-based cache for this model.
+     */
+    public function getCacheTags(int $domainId): array
+    {
+        return [
+            "domain_{$domainId}",
+            $this->getViewCacheTag()
+        ];
+    }
+
+    /**
+     * View-level cache tag like "page_view", "product_view", etc.
+     */
+    public function getViewCacheTag(): string
+    {
+        return match ($this->getCacheType()) {
+            'page'     => 'page_view',
+            'product'  => 'product_view',
+            'category' => 'category_view',
+            default    => 'view',
+        };
+    }
+
+    /**
+     * Full cache key for this model in a domain context.
+     */
+    public function getCacheKeyForDomain(int $domainId): string
+    {
+        return "ui:domain_{$domainId}:{$this->getCacheType()}:{$this->getKey()}";
+    }
+
+    /**
+     * Default TTL for this model's cache (in seconds).
+     */
+    public function getCacheTTL(): int
+    {
+        return 3600;
     }
 }
