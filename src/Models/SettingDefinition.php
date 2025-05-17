@@ -3,9 +3,11 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 
 class SettingDefinition extends Model
 {
+    use HasCacheKeys;
     protected $fillable = [
         'entity_type',
         'key',

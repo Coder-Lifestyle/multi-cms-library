@@ -3,11 +3,12 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Tag extends Model
 {
-    use HasSettings;
+    use HasSettings, HasCacheKeys;
 
     protected $fillable = ['name', 'slug', 'domain_id'];
 
