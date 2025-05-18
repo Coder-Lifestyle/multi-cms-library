@@ -3,8 +3,11 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class Page extends Model
 {
@@ -62,6 +65,38 @@ class Page extends Model
         $fullPath = trim($categoryPath . '/' . $pageSlug, '/');
 
         return $domainUrl . '/' . $fullPath;
+    }
+
+    public function flushCache(): void
+    {
+        $builder = app(RedisKeyBuilder::class);
+        $pageId = $this->getKey();
+
+        $domainIds = Redis::smembers($builder->modelDomainsKey($this));
+
+        foreach ($domainIds as $domainId) {
+            Cache::store('redis')->tags([
+                $builder->domainTag($domainId),
+                $this->getViewCacheTag(),
+                $this->getCacheTag(),
+            ])->flush();
+        }
+
+        $usedKeyPattern = "{$builder->prefix()}:page_*:used_pages";
+
+        foreach (Redis::keys($usedKeyPattern) as $usedKey) {
+            if (Redis::sismember($usedKey, $pageId)) {
+                if (preg_match("/page_(\d+):used_pages$/", $usedKey, $m)) {
+                    $relatedPageId = $m[1];
+                    if ($relatedPage = self::find($relatedPageId)) {
+                        $relatedPage->flushCache(); 
+                    }
+                }
+            }
+        }
+
+        Redis::del($builder->modelDomainsKey($this));
+        Redis::del($builder->modelUsedPagesKey($this));
     }
 }
 

@@ -3,12 +3,13 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasUniqueField;
 
 class Area extends Model
 {
-    use HasSettings, HasUniqueField;
+    use HasSettings, HasUniqueField, HasCacheKeys;
 
     protected $fillable = ['name', 'domain_id'];
 

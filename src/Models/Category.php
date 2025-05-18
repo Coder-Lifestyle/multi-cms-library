@@ -5,12 +5,16 @@ namespace MultiCmsLibrary\SharedModels\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasUniqueField;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class Category extends Model
 {
-    use HasSettings, HasUniqueField;
+    use HasSettings, HasUniqueField, HasCacheKeys;
 
     protected $fillable = ['name', 'slug', 'domain_id', 'parent_id', 'image_url'];
 
@@ -67,6 +71,7 @@ class Category extends Model
         if (!$this->domain) {
             return null;
         }
+        
 
         $domainUrl = rtrim($this->domain->domain_url, '/');
 
@@ -75,6 +80,23 @@ class Category extends Model
         $fullPath = trim($fullSlugPath, '/');
 
         return $domainUrl . '/' . $fullPath;
+    }
+
+    public function flushCache(): void
+    {
+        $builder = app(RedisKeyBuilder::class);
+
+        $domainIds = Redis::smembers($builder->modelDomainsKey($this));
+
+        foreach ($domainIds as $domainId) {
+            Cache::store('redis')->tags([
+                $builder->domainTag($domainId),
+                $this->getViewCacheTag(),
+                $this->getCacheTag(),
+            ])->flush();
+        }
+
+        Redis::del($builder->modelDomainsKey($this));
     }
 }
 

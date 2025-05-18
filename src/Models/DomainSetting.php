@@ -3,9 +3,11 @@
 namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 
 class DomainSetting extends Model
 {
+    use HasCacheKeys;
     protected $fillable = ['domain_id', 'key', 'value'];
 
     public static function getSetting($domainId, $key, $default = null)

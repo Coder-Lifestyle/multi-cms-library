@@ -4,11 +4,12 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
 class Menu extends Model
 {
-    use HasSettings;
+    use HasSettings, HasCacheKeys;
 
     protected $fillable = ['name', 'type', 'area_id', 'domain_id'];
 
