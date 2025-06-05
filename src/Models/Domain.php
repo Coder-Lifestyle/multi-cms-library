@@ -22,6 +22,7 @@ class Domain extends Model
         'domain_url',
         'page_creation_type',
         'sections',
+        'domain_category'
     ];
 
     protected $casts = [
