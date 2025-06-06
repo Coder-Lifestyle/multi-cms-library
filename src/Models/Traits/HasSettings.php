@@ -66,11 +66,49 @@ trait HasSettings
      */
     public static function settingsValidationRules(): array
     {
-        return [
-            'settings'            => ['nullable', 'array'],
-            'settings.*.key'      => ['required', Rule::in(static::allowedSettingsKeys())],
-            'settings.*.value'    => ['nullable', 'string'],
+        $rules = [
+            'settings' => ['nullable', 'array'],
+            'settings.*.key' => ['required', Rule::in(static::allowedSettingsKeys())],
         ];
+
+        $definitions = static::allowedSettingsDefinitions();
+
+        // Required key check at array level
+        $requiredKeys = $definitions->where('required', true)->pluck('key')->toArray();
+        foreach ($requiredKeys as $requiredKey) {
+            $rules["settings"][] = function ($attribute, $value, $fail) use ($requiredKey) {
+                $found = collect($value ?? [])->contains('key', $requiredKey);
+                if (! $found) {
+                    $fail("The required setting `{$requiredKey}` is missing.");
+                }
+            };
+        }
+
+        foreach ($definitions as $def) {
+            $ruleKey = "settings.*.value";
+            $keySpecificRule = match ($def->type) {
+                'string' => ['nullable', 'string'],
+                'boolean' => ['nullable', 'boolean'],
+                'integer' => ['nullable', 'integer'],
+                'autocomplete_page' => ['nullable', 'exists:pages,id'],
+                default => ['nullable', 'string'],
+            };
+
+            $rules[$ruleKey][] = function ($attribute, $value, $fail) use ($def, $keySpecificRule) {
+                $index = explode('.', $attribute)[1] ?? null;
+                if (is_numeric($index) && request()->input("settings.$index.key") === $def->key) {
+                    $validator = Validator::make(
+                        ['value' => $value],
+                        ['value' => $keySpecificRule]
+                    );
+                    if ($validator->fails()) {
+                        $fail("Invalid value for setting `{$def->key}`: " . $validator->errors()->first('value'));
+                    }
+                }
+            };
+        }
+
+        return $rules;
     }
 
     /**
