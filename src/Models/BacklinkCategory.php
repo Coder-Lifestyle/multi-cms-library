@@ -4,6 +4,7 @@ namespace MultiCmsLibrary\SharedModels\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MultiCmsLibrary\SharedModels\Database\Factories\BacklinkCategoryFactory;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 
@@ -20,6 +21,11 @@ class BacklinkCategory extends Model
         'name_fr',
         'name_es',
     ];
+
+    public static function newFactory()
+    {
+        return BacklinkCategoryFactory::new();
+    }
 
     /**
      * Get all backlinks associated with the category.

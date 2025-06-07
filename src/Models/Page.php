@@ -2,16 +2,23 @@
 
 namespace MultiCmsLibrary\SharedModels\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use MultiCmsLibrary\SharedModels\Database\Factories\PageFactory;
 
 class Page extends Model
 {
-    use HasSettings, HasCacheKeys;
+    use HasSettings, HasCacheKeys, HasFactory;
+
+    public static function newFactory()
+    {
+        return PageFactory::new();
+    }
 
     protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
 
