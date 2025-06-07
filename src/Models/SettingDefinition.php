@@ -14,8 +14,13 @@ class SettingDefinition extends Model
         'type',
         'default_value',
         'description',
+        'required'
     ];
 
+    protected $casts = [
+        'required' => 'boolean',
+    ];
+    
     public static function forEntity(string $entityType)
     {
         return static::where('entity_type', $entityType)->get();

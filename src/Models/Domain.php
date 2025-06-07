@@ -22,7 +22,7 @@ class Domain extends Model
         'domain_url',
         'page_creation_type',
         'sections',
-        'domain_category'
+        'domain_category',
     ];
 
     protected $casts = [
@@ -125,5 +125,4 @@ class Domain extends Model
 
         Cache::store('redis')->forget($builder->staticKey('shop', $domainId));
     }
-
 }
