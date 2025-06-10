@@ -2,6 +2,7 @@
 
 namespace MultiCmsLibrary\SharedModels\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -9,10 +10,11 @@ use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use Illuminate\Support\Facades\Redis;
+use MultiCmsLibrary\SharedModels\Database\Factories\DomainFactory;
 
 class Domain extends Model
 {
-    use HasSettings, HasCacheKeys;
+    use HasSettings, HasCacheKeys, HasFactory;
     // Define the table name if it's different from the plural form of the model
     // protected $table = 'domains';
 
@@ -28,6 +30,11 @@ class Domain extends Model
     protected $casts = [
         'sections' => 'array',
     ];
+
+    public static function newFactory()
+    {
+        return DomainFactory::new();
+    }
 
     /**
      * A domain has many pages.

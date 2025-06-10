@@ -2,6 +2,7 @@
 
 namespace MultiCmsLibrary\SharedModels\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,10 +12,16 @@ use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasUniqueField;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use MultiCmsLibrary\SharedModels\Database\Factories\CategoryFactory;
 
 class Category extends Model
 {
-    use HasSettings, HasUniqueField, HasCacheKeys;
+    use HasSettings, HasUniqueField, HasCacheKeys, HasFactory;
+
+    public static function newFactory()
+    {
+        return CategoryFactory::new();
+    }
 
     protected $fillable = ['name', 'slug', 'domain_id', 'parent_id', 'image_url'];
 

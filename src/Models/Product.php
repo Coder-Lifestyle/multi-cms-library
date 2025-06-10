@@ -9,6 +9,7 @@ use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use MultiCmsLibrary\SharedModels\Database\Factories\ProductFactory;
 
 class Product extends Model
 {
@@ -31,6 +32,11 @@ class Product extends Model
         'rating',
         'affiliate_link'
     ];
+
+    public static function newFactory()
+    {
+        return ProductFactory::new();
+    }
 
     /**
      * Get the domain that owns the product.
