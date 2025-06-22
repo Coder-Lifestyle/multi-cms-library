@@ -23,6 +23,7 @@ class Backlink extends Model
         'subscription_type',
         'subscription_end_date',
         'stripe_subscription_id',
+        'stripe_subscription_item_id',
         'is_active'
     ];
 
