@@ -8,7 +8,6 @@ use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use MultiCmsLibrary\SharedModels\Database\Factories\ProductFactory;
 
 class Product extends Model
@@ -56,18 +55,21 @@ class Product extends Model
 
     public function flushCache(): void
     {
-        $builder = app(RedisKeyBuilder::class);
+        $builder   = app(RedisKeyBuilder::class);
 
-        $domainIds = Redis::smembers($builder->modelDomainsKey($this));
+        // pull the list of domain IDs from the default cache
+        $domainIds = Cache::get($builder->modelDomainsKey($this), []);
 
+        // flush each domain’s tagged caches
         foreach ($domainIds as $domainId) {
-            Cache::store('redis')->tags([
+            Cache::tags([
                 $builder->domainTag($domainId),
                 $this->getViewCacheTag(),
                 $this->getCacheTag(),
             ])->flush();
         }
 
-        Redis::del($builder->modelDomainsKey($this));
+        // remove the stored list key
+        Cache::forget($builder->modelDomainsKey($this));
     }
 }

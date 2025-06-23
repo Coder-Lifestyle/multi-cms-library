@@ -76,33 +76,29 @@ class Page extends Model
     public function flushCache(): void
     {
         $builder = app(RedisKeyBuilder::class);
-        $pageId = $this->getKey();
+        $pageId  = $this->getKey();
 
-        $domainIds = Redis::smembers($builder->modelDomainsKey($this));
-
+        // 1) Flush per-domain tagged caches
+        $domainIds = Cache::get($builder->modelDomainsKey($this), []);
         foreach ($domainIds as $domainId) {
-            Cache::store('redis')->tags([
+            Cache::tags([
                 $builder->domainTag($domainId),
                 $this->getViewCacheTag(),
                 $this->getCacheTag(),
             ])->flush();
         }
 
-        $usedKeyPattern = "{$builder->prefix()}:page_*:used_pages";
-
-        foreach (Redis::keys($usedKeyPattern) as $usedKey) {
-            if (Redis::sismember($usedKey, $pageId)) {
-                if (preg_match("/page_(\d+):used_pages$/", $usedKey, $m)) {
-                    $relatedPageId = $m[1];
-                    if ($relatedPage = self::find($relatedPageId)) {
-                        $relatedPage->flushCache();
-                    }
-                }
+        // 2) Flush any pages this page “uses”
+        $usedPageIds = Cache::get($builder->modelUsedPagesKey($this), []);
+        foreach ($usedPageIds as $relatedPageId) {
+            if ($relatedPage = self::find($relatedPageId)) {
+                $relatedPage->flushCache();
             }
         }
 
-        Redis::del($builder->modelDomainsKey($this));
-        Redis::del($builder->modelUsedPagesKey($this));
+        // 3) Remove the stored lists
+        Cache::forget($builder->modelDomainsKey($this));
+        Cache::forget($builder->modelUsedPagesKey($this));
     }
 }
 
