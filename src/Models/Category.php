@@ -78,7 +78,7 @@ class Category extends Model
         if (!$this->domain) {
             return null;
         }
-        
+
 
         $domainUrl = rtrim($this->domain->domain_url, '/');
 
@@ -91,19 +91,22 @@ class Category extends Model
 
     public function flushCache(): void
     {
-        $builder = app(RedisKeyBuilder::class);
+        $builder   = app(RedisKeyBuilder::class);
 
-        $domainIds = Redis::smembers($builder->modelDomainsKey($this));
+        // pull the list of domain IDs from the default cache store
+        $domainIds = Cache::get($builder->modelDomainsKey($this), []);
 
+        // flush each domain’s tagged caches using the default cache driver
         foreach ($domainIds as $domainId) {
-            Cache::store('redis')->tags([
+            Cache::tags([
                 $builder->domainTag($domainId),
                 $this->getViewCacheTag(),
                 $this->getCacheTag(),
             ])->flush();
         }
 
-        Redis::del($builder->modelDomainsKey($this));
+        // remove the stored list key
+        Cache::forget($builder->modelDomainsKey($this));
     }
 }
 
