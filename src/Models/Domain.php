@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
-use Illuminate\Support\Facades\Redis;
 use MultiCmsLibrary\SharedModels\Database\Factories\DomainFactory;
 
 class Domain extends Model
@@ -94,42 +93,42 @@ class Domain extends Model
 
     public function flushCache(): void
     {
-        $builder = app(RedisKeyBuilder::class);
         $domainId = $this->id;
 
+        // 1) Build all the keys (using your HasCacheKeys trait methods)
+        $pageKey         = $this->domainPagesKey($domainId);
+        $relatedPageKey  = $this->domainRelatedKey($domainId, 'pages');
+        $productKey      = $this->domainRelatedKey($domainId, 'products');
+        $categoryKey     = $this->domainRelatedKey($domainId, 'categories');
+        $staticShopKey   = $this->staticKey('shop', $domainId);
 
-        $pageIds = Redis::smembers($builder->domainPagesKey($domainId));
-        $relatedPageIds = Redis::smembers($builder->domainRelatedKey($domainId, 'pages'));
+        // 2) Collect all IDs, flush each model’s cache
+        $pageIds        = Cache::get($pageKey, []);
+        $relatedPageIds = Cache::get($relatedPageKey, []);
+        collect($pageIds)
+            ->merge($relatedPageIds)
+            ->unique()
+            ->each(fn($id) => Page::find($id)?->flushCache());
 
-        foreach (collect($pageIds)->merge($relatedPageIds)->unique() as $id) {
-            if ($page = Page::find($id)) {
-                $page->flushCache();
-            }
-        }
-
-        Redis::del($builder->domainPagesKey($domainId));
-        Redis::del($builder->domainRelatedKey($domainId, 'pages'));
-
-        $productIds = Redis::smembers($builder->domainRelatedKey($domainId, 'products'));
-
+        $productIds = Cache::get($productKey, []);
         foreach ($productIds as $id) {
-            if ($product = Product::find($id)) {
-                $product->flushCache();
-            }
+            Product::find($id)?->flushCache();
         }
 
-        Redis::del($builder->domainRelatedKey($domainId, 'products'));
-
-        $categoryIds = Redis::smembers($builder->domainRelatedKey($domainId, 'categories'));
-
+        $categoryIds = Cache::get($categoryKey, []);
         foreach ($categoryIds as $id) {
-            if ($category = Category::find($id)) {
-                $category->flushCache();
-            }
+            Category::find($id)?->flushCache();
         }
 
-        Redis::del($builder->domainRelatedKey($domainId, 'categories'));
-
-        Cache::store('redis')->forget($builder->staticKey('shop', $domainId));
+        // 3) Forget all of those keys
+        foreach ([
+                     $pageKey,
+                     $relatedPageKey,
+                     $productKey,
+                     $categoryKey,
+                     $staticShopKey,
+                 ] as $key) {
+            Cache::forget($key);
+        }
     }
 }
