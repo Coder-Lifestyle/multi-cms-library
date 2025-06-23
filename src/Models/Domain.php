@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
-use Illuminate\Support\Facades\Redis;
 use MultiCmsLibrary\SharedModels\Database\Factories\DomainFactory;
 
 class Domain extends Model
