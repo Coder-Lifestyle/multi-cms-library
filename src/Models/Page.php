@@ -8,7 +8,6 @@ use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use MultiCmsLibrary\SharedModels\Database\Factories\PageFactory;
 
 class Page extends Model
@@ -38,7 +37,7 @@ class Page extends Model
     {
         return $this->hasMany(Backlink::class)->where('is_active', true);
     }
-    
+
     /**
      * A page can have multiple tags.
      */
@@ -46,7 +45,7 @@ class Page extends Model
     {
         return $this->belongsToMany(Tag::class)->withTimestamps(); // Many-to-many relation
     }
-    
+
     public function getBacklinkPriceAttribute()
     {
         return $this->domain?->getSetting('backlink_price', 12);
@@ -96,7 +95,7 @@ class Page extends Model
                 if (preg_match("/page_(\d+):used_pages$/", $usedKey, $m)) {
                     $relatedPageId = $m[1];
                     if ($relatedPage = self::find($relatedPageId)) {
-                        $relatedPage->flushCache(); 
+                        $relatedPage->flushCache();
                     }
                 }
             }
