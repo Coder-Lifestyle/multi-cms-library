@@ -9,7 +9,6 @@ use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
 use Illuminate\Support\Facades\Cache;
 use MultiCmsLibrary\SharedModels\Database\Factories\ProductFactory;
-
 class Product extends Model
 {
     use HasSettings, HasCacheKeys;
