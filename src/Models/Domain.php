@@ -91,8 +91,7 @@ class Domain extends Model
             });
     }
 
-    use Illuminate\Support\Facades\Cache;
-    use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
+
 
     public function flushCache(): void
     {
