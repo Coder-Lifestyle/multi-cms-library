@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasCacheKeys;
 use MultiCmsLibrary\SharedModels\Models\Traits\HasSettings;
+use Illuminate\Support\Facades\Redis;
 use MultiCmsLibrary\SharedModels\Database\Factories\DomainFactory;
 
 class Domain extends Model
@@ -91,44 +92,46 @@ class Domain extends Model
             });
     }
 
+    use Illuminate\Support\Facades\Cache;
+    use MultiCmsLibrary\SharedModels\Cache\RedisKeyBuilder;
+
     public function flushCache(): void
     {
+        $builder  = app(RedisKeyBuilder::class);
         $domainId = $this->id;
 
-        // 1) Build all the keys (using your HasCacheKeys trait methods)
-        $pageKey         = $this->domainPagesKey($domainId);
-        $relatedPageKey  = $this->domainRelatedKey($domainId, 'pages');
-        $productKey      = $this->domainRelatedKey($domainId, 'products');
-        $categoryKey     = $this->domainRelatedKey($domainId, 'categories');
-        $staticShopKey   = $this->staticKey('shop', $domainId);
+        // Pages & related pages
+        $pageIds        = Cache::get($builder->domainPagesKey($domainId), []);
+        $relatedPageIds = Cache::get($builder->domainRelatedKey($domainId, 'pages'), []);
 
-        // 2) Collect all IDs, flush each model’s cache
-        $pageIds        = Cache::get($pageKey, []);
-        $relatedPageIds = Cache::get($relatedPageKey, []);
-        collect($pageIds)
-            ->merge($relatedPageIds)
-            ->unique()
-            ->each(fn($id) => Page::find($id)?->flushCache());
+        foreach (collect($pageIds)->merge($relatedPageIds)->unique() as $id) {
+            if ($page = Page::find($id)) {
+                $page->flushCache();
+            }
+        }
+        Cache::forget($builder->domainPagesKey($domainId));
+        Cache::forget($builder->domainRelatedKey($domainId, 'pages'));
 
-        $productIds = Cache::get($productKey, []);
+        // Products
+        $productIds = Cache::get($builder->domainRelatedKey($domainId, 'products'), []);
         foreach ($productIds as $id) {
-            Product::find($id)?->flushCache();
+            if ($product = Product::find($id)) {
+                $product->flushCache();
+            }
         }
+        Cache::forget($builder->domainRelatedKey($domainId, 'products'));
 
-        $categoryIds = Cache::get($categoryKey, []);
+        // Categories
+        $categoryIds = Cache::get($builder->domainRelatedKey($domainId, 'categories'), []);
         foreach ($categoryIds as $id) {
-            Category::find($id)?->flushCache();
+            if ($category = Category::find($id)) {
+                $category->flushCache();
+            }
         }
+        Cache::forget($builder->domainRelatedKey($domainId, 'categories'));
 
-        // 3) Forget all of those keys
-        foreach ([
-                     $pageKey,
-                     $relatedPageKey,
-                     $productKey,
-                     $categoryKey,
-                     $staticShopKey,
-                 ] as $key) {
-            Cache::forget($key);
-        }
+        // Static shop key
+        Cache::forget($builder->staticKey('shop', $domainId));
     }
+
 }
