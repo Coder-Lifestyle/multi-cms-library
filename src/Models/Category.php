@@ -79,7 +79,6 @@ class Category extends Model
             return null;
         }
 
-
         $domainUrl = rtrim($this->domain->domain_url, '/');
 
         $fullSlugPath = $this->getFullSlugPath();
@@ -108,5 +107,24 @@ class Category extends Model
         // remove the stored list key
         Cache::forget($builder->modelDomainsKey($this));
     }
+
+    /**
+     * Allow reading $category->title as an alias for name.
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->attributes['name'];
+    }
+
+    /**
+     * Allow writing $category->title = 'Foo' to set the name field.
+     */
+    public function setTitleAttribute(string $value): void
+    {
+        $this->attributes['name'] = $value;
+    }
+
+
+
 }
 
