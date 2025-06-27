@@ -70,7 +70,7 @@ class Page extends Model
 
         $fullPath = trim($categoryPath . '/' . $pageSlug, '/');
 
-        return '/' . $fullPath;
+        return  '/' . $fullPath;
     }
 
     public function flushCache(): void
