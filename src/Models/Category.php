@@ -85,7 +85,7 @@ class Category extends Model
 
         $fullPath = trim($fullSlugPath, '/');
 
-        return $domainUrl . '/' . $fullPath;
+        return  '/' . $fullPath;
     }
 
     public function flushCache(): void
