@@ -68,7 +68,7 @@ class Page extends Model
 
         $pageSlug = $this->slug;
 
-        $fullPath = trim($categoryPath . '/' . $pageSlug, '/');
+        $fullPath = 'https://' . $domainUrl . '/'. trim($categoryPath . '/' . $pageSlug, '/');
 
         return  '/' . $fullPath;
     }
