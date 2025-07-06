@@ -63,11 +63,8 @@ class Page extends Model
         }
 
         $domainUrl = rtrim($this->domain->domain_url, '/');
-
         $categoryPath = $this->category ? $this->category->getFullSlugPath() : '';
-
         $pageSlug = $this->slug;
-
         $fullPath = 'https://' . $domainUrl . '/'. trim($categoryPath . '/' . $pageSlug, '/');
 
         return  '/' . $fullPath;
