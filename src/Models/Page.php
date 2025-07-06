@@ -61,12 +61,10 @@ class Page extends Model
         if (!$this->domain) {
             return null;
         }
-
         $domainUrl = rtrim($this->domain->domain_url, '/');
         $categoryPath = $this->category ? $this->category->getFullSlugPath() : '';
         $pageSlug = $this->slug;
         $fullPath = 'https://' . $domainUrl . '/'. trim($categoryPath . '/' . $pageSlug, '/');
-
         return  '/' . $fullPath;
     }
 
