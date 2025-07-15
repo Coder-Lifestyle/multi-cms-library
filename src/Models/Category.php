@@ -23,7 +23,7 @@ class Category extends Model
         return CategoryFactory::new();
     }
 
-    protected $fillable = ['name', 'slug', 'body', 'domain_id', 'parent_id', 'image_url'];
+    protected $fillable = ['name', 'slug', 'body', 'domain_id', 'parent_id', 'image_url', 'hide'];
 
     protected $appends = ['full_url'];
 
@@ -123,8 +123,5 @@ class Category extends Model
     {
         $this->attributes['name'] = $value;
     }
-
-
-
 }
 

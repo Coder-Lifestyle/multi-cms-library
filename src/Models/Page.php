@@ -19,7 +19,7 @@ class Page extends Model
         return PageFactory::new();
     }
 
-    protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image'];
+    protected $fillable = ['title', 'body', 'domain_id', 'category_id', 'slug', 'featured_image', 'hide'];
 
     protected $appends = ['backlink_price', 'full_url'];
 
